@@ -1,50 +1,35 @@
-const TelegramBot = require('node-telegram-bot-api');
-const fetch = require('node-fetch');
+import TelegramBot from 'node-telegram-bot-api';
+import dotenv from 'dotenv';
 
-const token = '7716709396:AAH4CpyfwN-EtdzFqpIbKolZz8OwiEla6qw'; // Remplace par ton token
+// Charger les variables d'environnement
+dotenv.config();
+
+const token = process.env.BOT_TOKEN; // 🔑 Mets ton token dans un fichier .env
 const bot = new TelegramBot(token, { polling: true });
 
-const API_URL = `https://api.telegram.org/bot${token}/setMessageReaction`;
+console.log('🤖 Bot démarré et en écoute...');
 
 // Gestion des erreurs de polling
 bot.on('polling_error', (error) => {
-    console.error('Erreur de connexion à Telegram :', error.message);
+    console.error('❌ Erreur de connexion à Telegram :', error.message);
 });
 
-// Fonction pour envoyer une réaction
-async function addReaction(chatId, messageId, emoji) {
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                message_id: messageId,
-                reaction: [{ type: 'emoji', emoji: emoji }],
-                is_big: true
-            }),
-        });
-
-        const data = await response.json();
-
-        if (!data.ok) {
-            console.error(`Erreur API Telegram : ${data.description}`);
-        } else {
-            console.log(`✅ Réaction ajoutée : ${emoji}`);
-        }
-    } catch (err) {
-        console.error('Erreur lors de l’envoi de la réaction :', err.message);
-    }
-}
-
-// Réagir aux messages dans les groupes et privés
+// Réagir aux messages dans les groupes/privés
 bot.on('message', async (msg) => {
-    await addReaction(msg.chat.id, msg.message_id, '👍');
+    try {
+        await bot.sendMessage(msg.chat.id, '✅ Réaction ajoutée !');
+        console.log('👍 Réaction ajoutée en privé/groupe !');
+    } catch (err) {
+        console.error('❌ Erreur dans message:', err.message);
+    }
 });
 
 // Réagir aux messages dans les canaux
 bot.on('channel_post', async (msg) => {
-    await addReaction(msg.chat.id, msg.message_id, '🔥');
+    try {
+        await bot.sendMessage(msg.chat.id, '🚀 Réaction ajoutée dans le canal !');
+        console.log('🚀 Réaction ajoutée dans le canal !');
+    } catch (err) {
+        console.error('❌ Erreur dans channel_post:', err.message);
+    }
 });
-
-console.log('🤖 Bot démarré et en écoute...');

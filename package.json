@@ -1,0 +1,17 @@
+{
+  "name": "telegram-bot",
+  "version": "1.0.0",
+  "description": "Un bot Telegram simple avec réactions aux messages",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.61.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "Ton Nom",
+  "license": "MIT"
+}

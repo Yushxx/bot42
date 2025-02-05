@@ -14,22 +14,26 @@ bot.on('polling_error', (error) => {
     console.error('❌ Erreur de connexion à Telegram :', error.message);
 });
 
+// Fonction pour ajouter une réaction
+async function addReaction(chatId, messageId, emoji) {
+    try {
+        await bot.request('setMessageReaction', {
+            chat_id: chatId,
+            message_id: messageId,
+            reaction: [{ type: 'emoji', emoji: emoji }],
+        });
+        console.log(`✅ Réaction ${emoji} ajoutée !`);
+    } catch (err) {
+        console.error('❌ Erreur lors de l’ajout de la réaction :', err.message);
+    }
+}
+
 // Réagir aux messages dans les groupes/privés
 bot.on('message', async (msg) => {
-    try {
-        await bot.sendMessage(msg.chat.id, '✅ Réaction ajoutée !');
-        console.log('👍 Réaction ajoutée en privé/groupe !');
-    } catch (err) {
-        console.error('❌ Erreur dans message:', err.message);
-    }
+    await addReaction(msg.chat.id, msg.message_id, '👍'); // Emoji 👍 ajouté
 });
 
 // Réagir aux messages dans les canaux
 bot.on('channel_post', async (msg) => {
-    try {
-        await bot.sendMessage(msg.chat.id, '🚀 Réaction ajoutée dans le canal !');
-        console.log('🚀 Réaction ajoutée dans le canal !');
-    } catch (err) {
-        console.error('❌ Erreur dans channel_post:', err.message);
-    }
+    await addReaction(msg.chat.id, msg.message_id, '🔥'); // Emoji 🔥 ajouté
 });

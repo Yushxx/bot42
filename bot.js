@@ -1,61 +1,31 @@
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
+const TelegramBot = require('node-telegram-bot-api');
 
-dotenv.config();
+const token = '7716709396:AAH4CpyfwN-EtdzFqpIbKolZz8OwiEla6qw'; // <-- Remplace par ton token
+const bot = new TelegramBot(token, { polling: true });
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const EMOJI = process.env.EMOJI;
-const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/`;
+// Gestion des erreurs de polling
+bot.on('polling_error', (error) => {
+    console.error('Erreur de connexion à Telegram :', error.message);
+});
 
-async function callTelegramAPI(method, body) {
-    const response = await fetch(API_URL + method, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-    });
-    const data = await response.json();
-    
-    if (!data.ok) {
-        console.error(`Erreur API Telegram : ${data.description}`);
+// Réagir aux messages dans les groupes/privés
+bot.on('message', async (msg) => {
+    try {
+        await bot.setMessageReaction(msg.chat.id, msg.message_id, [{ type: 'emoji', emoji: '👍' }]);
+        console.log('Réaction ajoutée en privé/groupe !');
+    } catch (err) {
+        console.error('Erreur dans message:', err.message);
     }
-    return data;
-}
+});
 
-async function setMessageReaction(chatId, messageId) {
-    const body = {
-        chat_id: chatId,
-        message_id: messageId,
-        reaction: [{ type: 'emoji', emoji: EMOJI }],
-        is_big: true
-    };
-
-    await callTelegramAPI('setMessageReaction', body);
-}
-
-async function startBot() {
-    let offset = 0;
-
-    console.log('🤖 Bot en écoute...');
-
-    while (true) {
-        try {
-            const updates = await callTelegramAPI('getUpdates', { offset, timeout: 30 });
-
-            for (const update of updates.result) {
-                if (update.channel_post) {
-                    const { chat, message_id } = update.channel_post;
-                    console.log(`📩 Nouveau message détecté dans ${chat.title}`);
-
-                    await setMessageReaction(chat.id, message_id);
-                    console.log('✅ Réaction ajoutée !');
-
-                    offset = update.update_id + 1;
-                }
-            }
-        } catch (error) {
-            console.error('Erreur dans la boucle du bot:', error);
-        }
+// Réagir aux messages dans les canaux
+bot.on('channel_post', async (msg) => {
+    try {
+        await bot.setMessageReaction(msg.chat.id, msg.message_id, [{ type: 'emoji', emoji: '🚀' }]);
+        console.log('Réaction ajoutée dans le canal !');
+    } catch (err) {
+        console.error('Erreur dans channel_post:', err.message);
     }
-}
+});
 
-startBot();
+console.log('Bot démarré !');

@@ -1,6 +1,8 @@
-const TelegramBot = require('node-telegram-bot-api');
-const fetch = require('node-fetch');
-require('dotenv').config();
+import TelegramBot from 'node-telegram-bot-api';
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Ton token de bot Telegram (remplace avec ton vrai token)
 const token = process.env.BOT_TOKEN;
@@ -72,7 +74,7 @@ bot.on('message', async (msg) => {
 
 // Réagir aux messages dans les canaux
 bot.on('channel_post', async (msg) => {
-    const emojiList = ['😎', '💥', '✨', '🌟']; // Liste d'emojis pour les canaux
+    const emojiList = ['🚀', '💥', '✨', '🌟']; // Liste d'emojis pour les canaux
     const { chat, message_id } = msg;
 
     try {
